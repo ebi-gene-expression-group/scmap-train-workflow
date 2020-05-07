@@ -24,7 +24,7 @@ process create_training_sce {
                 --metadata-files ${train_metadata}\
                 --cell-id-column ${params.cell_id_col}\
                 --metadata-columns ${params.cell_id_col},${params.cluster_col}\
-                --output-object-file reference_sce.rds
+                --output-object-file training_sce.rds
     """ 
 }
 
@@ -66,7 +66,6 @@ process select_train_features {
     """
     scmap-select-features.R\
                 --input-object-file ${train_sce}\
-                --output-plot-file ${params.plot_file}\
                 --output-object-file train_features.rds
     """
 }
@@ -80,6 +79,7 @@ TRAINING_FEATURES.choice(TRAIN_CLUSTER, TRAIN_CELL){channels[projection_method]}
 
 // obtain index for cluster-level projections 
 process index_cluster {
+    publishDir "${params.results_dir}"
     conda "${baseDir}/envs/scmap.yaml"
 
     errorStrategy { task.exitStatus == 130 || task.exitStatus == 137  ? 'retry' : 'finish' }   
@@ -97,12 +97,14 @@ process index_cluster {
     scmap-index-cluster.R\
                     --input-object-file ${train_features_sce}\
                     --cluster-col ${params.cluster_col}\
-                    --output-object-file ref_index_cluster.rds
+                    --train-id ${params.training_dataset_id}\
+                    --output-object-file scmap_index_cluster.rds
     """
 }
 
 // obtain index for cell-level projections 
 process index_cell {
+    publishDir "${params.results_dir}"
     conda "${baseDir}/envs/scmap.yaml"
 
     errorStrategy { task.exitStatus == 130 || task.exitStatus == 137  ? 'retry' : 'finish' }   
@@ -118,9 +120,9 @@ process index_cell {
     """
     scmap-index-cell.R\
                  --input-object-file ${train_features_sce}\
+                 --train-id ${params.training_dataset_id}\
                  --output-object-file scmap_index_cell.rds
     """
-
 }
 
 
