@@ -10,8 +10,6 @@ process create_training_sce {
     maxRetries 2
     memory { 16.GB * task.attempt }
     
-    maxForks 1
-
     input:
         file(train_metadata) from TRAIN_METADATA
         file(train_dir) from TRAIN_DIR
@@ -39,8 +37,6 @@ process preprocess_training_sce {
     maxRetries 10
     memory { 16.GB * task.attempt }
 
-    maxForks 1
-
     input:
         file(train_sce) from TRAINING_SCE 
 
@@ -61,8 +57,6 @@ process select_train_features {
     errorStrategy { task.exitStatus == 130 || task.exitStatus == 137  ? 'retry' : 'finish' }
     maxRetries 10
     memory { 16.GB * task.attempt }
-
-    maxForks 1
 
     input:
         file(train_sce) from TRAINING_SCE_PROC
@@ -92,8 +86,6 @@ process index_cluster {
     maxRetries 10
     memory { 16.GB * task.attempt }
 
-    maxForks 1
-
     input:
         file(train_features_sce) from TRAIN_CLUSTER
 
@@ -119,8 +111,6 @@ process index_cell {
     maxRetries 10
     memory { 16.GB * task.attempt }
 
-    maxForks 1
-    
     input:
         file(train_features_sce) from TRAIN_CELL
 
