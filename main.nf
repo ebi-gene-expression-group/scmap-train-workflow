@@ -89,7 +89,6 @@ process index_cluster {
     input:
         file(train_features_sce) from TRAIN_CLUSTER
 
-    //TODO: add dataset ID as input param ?  
     output:
         file("scmap_index_cluster.rds") into CLUSTER_INDEX
 
