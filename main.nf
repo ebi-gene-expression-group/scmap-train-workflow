@@ -6,9 +6,8 @@ TRAIN_METADATA = Channel.fromPath(params.training_metadata)
 process create_training_sce {
     conda "${baseDir}/envs/dropletutils.yaml"
 
-    errorStrategy { task.exitStatus == 130 || task.exitStatus == 137  ? 'retry' : 'finish' }   
-    maxRetries 2
     memory { 16.GB * task.attempt }
+    errorStrategy { task.attempt<=10 ? 'retry' : 'ignore' }
     
     input:
         file(train_metadata) from TRAIN_METADATA
@@ -33,9 +32,8 @@ process create_training_sce {
 process preprocess_training_sce {
     conda "${baseDir}/envs/scmap.yaml"
 
-    errorStrategy { task.exitStatus == 130 || task.exitStatus == 137  ? 'retry' : 'finish' }   
-    maxRetries 10
     memory { 16.GB * task.attempt }
+    errorStrategy { task.attempt<=10 ? 'retry' : 'ignore' }
 
     input:
         file(train_sce) from TRAINING_SCE 
@@ -54,9 +52,8 @@ process select_train_features {
     publishDir "${baseDir}/data/output", mode: 'copy'
     conda "${baseDir}/envs/scmap.yaml"
 
-    errorStrategy { task.exitStatus == 130 || task.exitStatus == 137  ? 'retry' : 'finish' }
-    maxRetries 10
     memory { 16.GB * task.attempt }
+    errorStrategy { task.attempt<=10 ? 'retry' : 'ignore' }
 
     input:
         file(train_sce) from TRAINING_SCE_PROC
@@ -82,9 +79,8 @@ process index_cluster {
     publishDir "${params.results_dir}"
     conda "${baseDir}/envs/scmap.yaml"
 
-    errorStrategy { task.exitStatus == 130 || task.exitStatus == 137  ? 'retry' : 'finish' }   
-    maxRetries 10
     memory { 16.GB * task.attempt }
+    errorStrategy { task.attempt<=10 ? 'retry' : 'ignore' }
 
     input:
         file(train_features_sce) from TRAIN_CLUSTER
@@ -106,9 +102,8 @@ process index_cell {
     publishDir "${params.results_dir}"
     conda "${baseDir}/envs/scmap.yaml"
 
-    errorStrategy { task.exitStatus == 130 || task.exitStatus == 137  ? 'retry' : 'finish' }   
-    maxRetries 10
     memory { 16.GB * task.attempt }
+    errorStrategy { task.attempt<=10 ? 'retry' : 'ignore' }
 
     input:
         file(train_features_sce) from TRAIN_CELL
