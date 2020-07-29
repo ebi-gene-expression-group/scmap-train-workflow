@@ -6,8 +6,8 @@ TRAIN_METADATA = Channel.fromPath(params.training_metadata)
 process create_training_sce {
     conda "${baseDir}/envs/dropletutils.yaml"
 
-    memory { 16.GB * task.attempt }
-    errorStrategy { task.attempt<=10 ? 'retry' : 'ignore' }
+    memory { 32.GB * task.attempt }
+    errorStrategy { task.attempt<=5 ? 'retry' : 'ignore' }
     
     input:
         file(train_metadata) from TRAIN_METADATA
@@ -32,8 +32,8 @@ process create_training_sce {
 process preprocess_training_sce {
     conda "${baseDir}/envs/scmap.yaml"
 
-    memory { 16.GB * task.attempt }
-    errorStrategy { task.attempt<=10 ? 'retry' : 'ignore' }
+    memory { 64.GB * task.attempt }
+    errorStrategy { task.attempt<=5 ? 'retry' : 'ignore' }
 
     input:
         file(train_sce) from TRAINING_SCE 
