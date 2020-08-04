@@ -1,8 +1,46 @@
 #!/usr/bin/env nextflow 
 
-// produce sce object for training dataset
+// set up channels
 TRAIN_DIR = Channel.fromPath(params.training_10x_dir)
 TRAIN_METADATA = Channel.fromPath(params.training_metadata)
+
+// if necessary, down-sample cells to avoid memory issues 
+process downsample_cells {
+    conda "${baseDir}/envs/label_analysis.yaml"
+
+    memory { 10.GB * task.attempt }
+    maxRetries 5
+    errorStrategy { task.attempt<=5 ? 'retry' : 'ignore' }
+
+    input:
+        file(expression_data) from TRAIN_DIR
+        file(training_metadata) from TRAIN_METADATA
+        
+    output:
+        file("expr_data_downsampled") into TRAIN_DIR_DOWNSAMPLED
+        file("metadata_filtered.tsv") into TRAIN_METADATA_DOWNSAMPLED
+
+    """
+    set +e
+    downsample_cells.R\
+        --expression-data ${expression_data}\
+        --metadata ${training_metadata}\
+        --exclusions ${params.exclusions}\
+        --cell-id-field ${params.cell_id_col}\
+        --cell-type-field ${cluster_col}\
+        --output-dir expr_data_downsampled\
+        --metadata-upd metadata_filtered.tsv
+
+    if [ $? -eq  2 ];
+    then
+        cp -P ${expression_data} expr_data_downsampled
+        cp -P ${training_metadata} metadata_filtered.tsv
+        exit 0
+    fi
+    """
+}
+
+// produce sce object for training dataset
 process create_training_sce {
     conda "${baseDir}/envs/dropletutils.yaml"
 
@@ -11,8 +49,8 @@ process create_training_sce {
     errorStrategy { task.attempt<=5 ? 'retry' : 'ignore' }
     
     input:
-        file(train_metadata) from TRAIN_METADATA
-        file(train_dir) from TRAIN_DIR
+        file(train_metadata) from TRAIN_METADATA_DOWNSAMPLED
+        file(train_dir) from TRAIN_DIR_DOWNSAMPLED
 
     output:
         file("training_sce.rds") into TRAINING_SCE
