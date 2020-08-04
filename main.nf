@@ -44,7 +44,7 @@ process downsample_cells {
 process create_training_sce {
     conda "${baseDir}/envs/dropletutils.yaml"
 
-    memory { 16.GB * task.attempt }
+    memory { 32.GB * task.attempt }
     maxRetries 5
     errorStrategy { task.attempt<=5 ? 'retry' : 'ignore' }
     
@@ -71,7 +71,7 @@ process create_training_sce {
 process preprocess_training_sce {
     conda "${baseDir}/envs/scmap.yaml"
 
-    memory { 16.GB * task.attempt }
+    memory { 32.GB * task.attempt }
     maxRetries 5
     errorStrategy { task.attempt<=5 ? 'retry' : 'ignore' }
 
@@ -92,7 +92,7 @@ process select_train_features {
     publishDir "${baseDir}/data/output", mode: 'copy'
     conda "${baseDir}/envs/scmap.yaml"
 
-    memory { 16.GB * task.attempt } 
+    memory { 32.GB * task.attempt } 
     maxRetries 5
     errorStrategy { task.attempt<=5 ? 'retry' : 'ignore' }
 
@@ -120,7 +120,7 @@ process index_cluster {
     publishDir "${params.results_dir}"
     conda "${baseDir}/envs/scmap.yaml"
 
-    memory { 16.GB * task.attempt }
+    memory { 32.GB * task.attempt }
     maxRetries 5
     errorStrategy { task.attempt<=5 ? 'retry' : 'ignore' }
 
@@ -144,7 +144,7 @@ process index_cell {
     publishDir "${params.results_dir}"
     conda "${baseDir}/envs/scmap.yaml"
 
-    memory { 16.GB * task.attempt }
+    memory { 32.GB * task.attempt }
     maxRetries 5
     errorStrategy { task.attempt<=5 ? 'retry' : 'ignore' }
 
