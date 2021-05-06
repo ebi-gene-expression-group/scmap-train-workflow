@@ -22,8 +22,8 @@ process create_training_sce {
                 --samples ${train_dir}\
                 --col-names ${params.col_names}\
                 --metadata-files ${train_metadata}\
-                --cell-id-column ${params.cell_id_col}\
-                --metadata-columns ${params.cell_id_col},${params.cluster_col}\
+                --cell-id-column "${params.cell_id_col}"\
+                --metadata-columns "${params.cell_id_col}","${params.cluster_col}"\
                 --output-object-file training_sce.rds
     """ 
 }
@@ -96,7 +96,7 @@ process index_cluster {
     """
     scmap-index-cluster.R\
                     --input-object-file ${train_features_sce}\
-                    --cluster-col ${params.cluster_col}\
+                    --cluster-col "${params.cluster_col}"\
                     --train-id ${params.training_dataset_id}\
                     --output-object-file scmap_index_cluster.rds
     """
