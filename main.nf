@@ -26,8 +26,8 @@ process downsample_cells {
         --expression-data ${expression_data}\
         --metadata ${training_metadata}\
         --exclusions ${params.exclusions}\
-        --cell-id-field ${params.cell_id_col}\
-        --cell-type-field ${params.cluster_col}\
+        --cell-id-field "${params.cell_id_col}"\
+        --cell-type-field "${params.cluster_col}"\
         --output-dir expr_data_downsampled\
         --metadata-upd metadata_filtered.tsv
 
